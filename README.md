@@ -17,45 +17,48 @@ Please reference other gems in case if multiple snapshot with effective date han
 
 ## Setup
 
-1. Add this line to your application's Gemfile: ```gem 'snapshot_tree'```
+1.  Add this line to your application's Gemfile: ```gem 'snapshot_tree'```
 
-2. Run ```bundle install```
+2.  Run ```bundle install```
 
-3. Add ```acts_as_tree``` to your hierarchical model(s), see configuration section below.
-   The ActiveRecord associations ```parent_tree_nodes``` and ```child_tree_nodes``` will be
-   added automatically to ease the creation of tree association records
+3.  Add ```acts_as_tree``` to your hierarchical model(s), see configuration section below.
 
-   ```ruby
-   include SnapshotTree::ActsAsTree
+    The ActiveRecord associations ```parent_tree_nodes``` and ```child_tree_nodes``` will be
+    added automatically to ease the creation of tree association records
 
-   acts_as_tree
-   ```
+    ```ruby
+    class Node < ActiveRecord::Base
+      include SnapshotTree::ActsAsTree
+      acts_as_tree
+    end
+    ```
 
-4. Add a database migration to store the hierarchy relation for your model.
-   Relation table's name must be the model's table name, followed by "_tree".
+4.  Add a database migration to store the hierarchy relation for your model.
+    Relation table's name must be the model's table name, followed by "_tree".
 
-   ```ruby
-   class CreateModelTrees < ActiveRecord::Migration
-     def change
-       create_table :model_trees do |t|
-         t.integer  :model_id
-         t.integer  :parent_id
-         t.boolean  :is_active       # default field name for :is_active_field option
-         t.date     :effective_on    # default field name for :snapshot_field option
+    ```ruby
+    class CreateModelTrees < ActiveRecord::Migration
+      def change
+        create_table :model_trees do |t|
+          t.integer  :child_id
+          t.integer  :parent_id
+          t.boolean  :is_active       # default field name for :is_active_field option
+          t.date     :effective_on    # default field name for :snapshot_field option
 
-         t.timestamps
-       end
-     end
-   end
-   ```
+          t.timestamps
+        end
+      end
+    end
+    ```
 
-5. Run ```rake db:migrate```
+5.  Run ```rake db:migrate```
 
 ## Configuration
 
 When you include ```acts_as_tree``` in your model, you can provide a hash to override the following defaults:
 
-* ```:foreign_key``` to override the column name of the parent foreign key in relation table. This defaults to "parent_id".
+* ```:child_key``` to override the column name of the child foreign key in relation table. This defaults to "child_id".
+* ```:parent_key``` to override the column name of the parent foreign key in relation table. This defaults to "parent_id".
 * ```:node_prefix``` to override the field name prefix of generated field after getting descendent_nodes or ancestor_nodes. This defaults to "node".
 * ```:snapshot_field``` to override the column name of snapshot effective date in relations table. This defaults to "effective_on". Set it to nil will disable effective date filtering when getting tree snapshot.
 * ```:is_active_field``` to override the column name of snapshot record active status in relation table. This defaults to "is_active". Set it to nil will disable active status checking.
@@ -66,7 +69,7 @@ When you include ```acts_as_tree``` in your model, you can provide a hash to ove
 
 ## Usage
 
-Creation tree association:
+### Creation tree association:
 
   ```ruby
   grandpa = Node.create(:name => 'grandpa')
@@ -80,14 +83,14 @@ Creation tree association:
 
 Accessing the tree:
 
-### Class methods
+#### Class methods
 
 * ```Node.root_nodes``` returns all root nodes
 * ```Node.leaf_nodes``` returns all leaf nodes
 * ```Node.descendent_nodes``` returns all descendent nodes, including children, children's children, ... etc.
 * ```Node.ancestor_nodes``` returns all ancestor nodes, including parent, grandparent, great grandparent, ... etc.
 
-### Instance methods
+#### Instance methods
 
 * ```Node.root_node``` returns the root node for this node
 * ```Node.root_node?``` returns true if this is a root node
@@ -97,14 +100,14 @@ Accessing the tree:
 * ```Node.descendent_nodes``` returns all descendent nodes for this node, including children, children's children, ... etc.
 * ```Node.ancestor_nodes``` returns all ancestor nodes for this node, including parent, grandparent, great grandparent, ... etc.
 
-### Extra options
+#### Extra options
 
-When calling the instance methods, you can pass a hash of options to override the default behavour:
+When calling the instance/class methods, you can pass a hash of options to override the default behavour:
 
 * ```:as_of``` to query the snapsot tree as of specify effective date, the latest effective date <= this parameter will be used to filter records. This defaults to today.
 * ```:depth``` to limit to number of level to query, 0 for all levels, 1 for direct children only, 2 for direct children and grand children, ... etc. This defaults to 0.
 
-When calling the class methods, in addition to the instance methods' options, you must pass an model or model id in order to query tree nodes:
+When calling the class methods, you must pass an model or model id in order to query tree nodes:
 
 ```Node.descendent_nodes(grandpa, :depth => 1, :as_of => '2010-01-01')```
 
