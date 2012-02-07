@@ -57,11 +57,13 @@ Please reference other gems in case if multiple snapshot with effective date han
 
 When you include ```acts_as_tree``` in your model, you can provide a hash to override the following defaults:
 
-* ```:child_key``` to override the column name of the child foreign key in relation table. This defaults to "child_id".
-* ```:parent_key``` to override the column name of the parent foreign key in relation table. This defaults to "parent_id".
-* ```:node_prefix``` to override the field name prefix of generated field after getting descendent_nodes or ancestor_nodes. This defaults to "node".
-* ```:snapshot_field``` to override the column name of snapshot effective date in relations table. This defaults to "effective_on". Set it to nil will disable effective date filtering when getting tree snapshot.
-* ```:is_active_field``` to override the column name of snapshot record active status in relation table. This defaults to "is_active". Set it to nil will disable active status checking.
+* ```:child_key``` to override the column name of the child foreign key in relation table. (default: ```child_id```)
+* ```:parent_key``` to override the column name of the parent foreign key in relation table. (default: ```parent_id```)
+* ```:node_prefix``` to override the field name prefix of generated field after getting descendent_nodes or ancestor_nodes. (default: ```node```) 
+* ```:snapshot_field``` to override the column name of snapshot effective date in relations table. (default: ```effective_on```)
+    - set it to ```nil``` will disable effective date filtering when getting tree snapshot.
+* ```:is_active_field``` to override the column name of snapshot record active status in relation table. (default: ```is_active```)
+    - set it to ```nil``` will disable active status checking.
 * ```:dependent``` determines what happens when a node is destroyed. Defaults to ```nullify```.
     * ```:nullify``` will simply set the parent column to null. Each child node will be considered a "root" node. This is the default.
     * ```:delete_all``` will delete all descendant nodes (which circumvents the destroy hooks)
