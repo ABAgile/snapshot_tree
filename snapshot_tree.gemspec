@@ -18,7 +18,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency "activerecord", ">= 3.0.0"
   gem.add_dependency "activesupport", ">= 3.0.0"
   gem.add_dependency "pg", ">= 0.11.0"
-  gem.add_dependency "hbs", "~> 0.1.2"
+  gem.add_dependency "handlebars"
 
   gem.add_development_dependency "rake"
   gem.add_development_dependency "rspec", "~> 2.6"
