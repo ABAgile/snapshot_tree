@@ -113,6 +113,14 @@ When calling the class methods, you must pass an model or model id in order to q
 
 ```Node.descendent_nodes(grandpa, :depth => 1, :as_of => '2010-01-01')```
 
+
+## Gem testing
+
+1. Copy spec/database.yml.sample to spec/database.yml and edit to appropriate values
+2. Create table 'tree_testing'
+3. Run ```load 'spec/db/schema.rb'``` in console
+4. ```bundle exec rspec spec/acts_as_tree_spec.rb```
+
 ## Contributing
 
 1. Fork it
