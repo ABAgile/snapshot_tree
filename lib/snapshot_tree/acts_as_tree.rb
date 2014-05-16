@@ -140,7 +140,7 @@ module SnapshotTree
       def nodes_query(query_type)
         return @query[query_type] if @query[query_type]
 
-        @query[query_type] = Handlebars.compile(
+        @query[query_type] = Handlebars::Context.new.compile(
           @template["#{query_type}_query"]
         ).call(
           {
