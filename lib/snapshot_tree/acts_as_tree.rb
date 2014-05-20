@@ -59,18 +59,18 @@ module SnapshotTree
         instance_variable_set :@tree_helper, TreeHelper.new(options)
 
         has_many :parent_tree_nodes,
+          -> { where(options[:is_active_field].to_sym => true) if options[:is_active_field] },
           class_name:  options[:join_class],
           foreign_key: options[:child_key],
           autosave:    true,
-          dependent:   options[:dependent],
-          conditions:  options[:is_active_field] ? {options[:is_active_field].to_sym => true} : nil
+          dependent:   options[:dependent]
 
         has_many :child_tree_nodes,
+          -> { where(optoins[:is_active_field].to_sym => true) if options[:is_active_field] },
           class_name:  options[:join_class],
           foreign_key: options[:parent_key],
           autosave:    true,
-          dependent:   options[:dependent],
-          conditions:  options[:is_active_field] ? {options[:is_active_field].to_sym => true} : nil
+          dependent:   options[:dependent]
 
         "#{options[:node_prefix]}_depth".to_sym.tap do |field|
           define_method(field) do
@@ -140,7 +140,7 @@ module SnapshotTree
       def nodes_query(query_type)
         return @query[query_type] if @query[query_type]
 
-        @query[query_type] = Handlebars.compile(
+        @query[query_type] = Handlebars::Context.new.compile(
           @template["#{query_type}_query"]
         ).call(
           {

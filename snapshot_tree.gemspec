@@ -15,13 +15,13 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
   gem.version       = SnapshotTree::VERSION
 
-  gem.add_dependency "activerecord", ">= 3.0.0"
-  gem.add_dependency "activesupport", ">= 3.0.0"
-  gem.add_dependency "pg", ">= 0.11.0"
-  gem.add_dependency "handlebars", "~> 0.4.0"
+  gem.add_dependency "activerecord", ">= 4.0.0"
+  gem.add_dependency "activesupport", ">= 4.0.0"
+  gem.add_dependency "pg", ">= 0.17.1"
+  gem.add_dependency "handlebars", "~> 0.6.0"
 
   gem.add_development_dependency "rake"
-  gem.add_development_dependency "rspec", "~> 2.6"
+  gem.add_development_dependency "rspec", "~> 2.14"
   gem.add_development_dependency "guard-rspec"
   gem.add_development_dependency "pry"
 end
