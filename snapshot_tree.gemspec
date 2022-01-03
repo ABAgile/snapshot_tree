@@ -4,7 +4,7 @@ require File.expand_path('../lib/snapshot_tree/version', __FILE__)
 Gem::Specification.new do |gem|
   gem.authors       = ["Szetobo"]
   gem.email         = ["szetobo@gmail.com"]
-  gem.homepage      = "https://github.com/szetobo/snapshot_tree"
+  gem.homepage      = "https://github.com/ABAgile/snapshot_tree"
   gem.summary       = "Mutliple snapshot hierarchical tree implementation of adjacency list using recursive query of Postgresql"
   gem.description   = "Mutliple snapshot hierarchical tree implementation of adjacency list using recursive query of Postgresql"
 
@@ -18,7 +18,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency "activerecord", ">= 4.0.0"
   gem.add_dependency "activesupport", ">= 4.0.0"
   gem.add_dependency "pg", ">= 0.17.1"
-  gem.add_dependency "handlebars", "~> 0.6.0"
+  gem.add_dependency "mustache", "~> 1.0"
 
   gem.add_development_dependency "rake"
   gem.add_development_dependency "rspec", "~> 2.14"

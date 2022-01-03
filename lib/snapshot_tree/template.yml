@@ -1,36 +1,38 @@
 root_query: |
   (
     SELECT model.* FROM {{model_table}} model
-    {{#if snapshot_field}}
+    {{#snapshot_field}}
       LEFT JOIN (
         SELECT {{child_key}}, {{parent_key}}, {{snapshot_field}}, id,
-          {{#is_active_field}}{{this}}, {{/is_active_field}}
+          {{#is_active_field}}{{is_active_field}}, {{/is_active_field}}
           RANK() OVER (PARTITION BY {{child_key}} ORDER BY {{snapshot_field}} DESC, id DESC)
         FROM {{join_table}}
         WHERE {{snapshot_field}} <= '__snapshot_value__'
-        {{#is_active_field}}AND {{this}}{{/is_active_field}}
+        {{#is_active_field}}AND {{is_active_field}}{{/is_active_field}}
       ) AS tree ON tree.{{child_key}} = model.id AND COALESCE(tree.rank, 1) = 1
-    {{else}}
+    {{/snapshot_field}}
+    {{^snapshot_field}}
       LEFT JOIN {{join_table}} tree ON tree.{{child_key}} = model.id
-    {{/if}}
+    {{/snapshot_field}}
     WHERE tree.{{parent_key}} IS NULL
   ) AS {{model_table}}
 
 leaf_query: |
   (
     SELECT model.* FROM {{model_table}} model
-    {{#if snapshot_field}}
+    {{#snapshot_field}}
       LEFT JOIN (
         SELECT {{child_key}}, {{parent_key}}, {{snapshot_field}}, id,
-          {{#is_active_field}}{{this}}, {{/is_active_field}}
+          {{#is_active_field}}{{is_active_field}}, {{/is_active_field}}
           RANK() OVER (PARTITION BY {{child_key}} ORDER BY {{snapshot_field}} DESC, id DESC)
         FROM {{join_table}}
         WHERE {{snapshot_field}} <= '__snapshot_value__'
-        {{#is_active_field}}AND {{this}}{{/is_active_field}}
+        {{#is_active_field}}AND {{is_active_field}}{{/is_active_field}}
       ) AS tree ON tree.{{parent_key}} = model.id AND COALESCE(tree.rank, 1) = 1
-    {{else}}
+    {{/snapshot_field}}
+    {{^snapshot_field}}
       LEFT JOIN {{join_table}} tree ON tree.{{parent_key}} = model.id
-    {{/if}}
+    {{/snapshot_field}}
     WHERE tree.{{child_key}} IS NULL
   ) AS {{model_table}}
 
@@ -41,7 +43,7 @@ descendent_query: |
         alias.{{child_key}}, alias.{{parent_key}},
         ARRAY[alias.{{parent_key}}] AS {{path}}, 1 AS {{depth}}, false AS {{cycle}}
       FROM {{join_table}} alias
-        {{#if snapshot_field}}JOIN snapshot ON snapshot.id = alias.id{{/if}}
+        {{#snapshot_field}}JOIN snapshot ON snapshot.id = alias.id{{/snapshot_field}}
       WHERE alias.{{parent_key}} = __model_id__
       UNION ALL
       SELECT
@@ -51,24 +53,25 @@ descendent_query: |
         alias.{{child_key}} = ANY(tree.{{path}}) AS {{cycle}}
       FROM tree
         JOIN {{join_table}} alias ON alias.{{parent_key}} = tree.{{child_key}}
-        {{#if snapshot_field}}JOIN snapshot ON snapshot.id = alias.id{{/if}}
+        {{#snapshot_field}}JOIN snapshot ON snapshot.id = alias.id{{/snapshot_field}}
       WHERE NOT tree.{{cycle}}
     )
     ,snapshot AS (
       SELECT alias.id
       FROM {{model_table}} model
-      {{#if snapshot_field}}
+      {{#snapshot_field}}
         LEFT JOIN (
           SELECT {{child_key}}, {{parent_key}}, {{snapshot_field}}, id,
-            {{#is_active_field}}{{this}}, {{/is_active_field}}
+            {{#is_active_field}}{{is_active_field}}, {{/is_active_field}}
             RANK() OVER (PARTITION BY {{child_key}} ORDER BY {{snapshot_field}} DESC, id DESC)
           FROM {{join_table}}
           WHERE {{snapshot_field}} <= '__snapshot_value__'
-          {{#is_active_field}}AND {{this}}{{/is_active_field}}
+          {{#is_active_field}}AND {{is_active_field}}{{/is_active_field}}
         ) AS alias ON alias.{{child_key}} = model.id AND COALESCE(rank, 1) = 1
-      {{else}}
+      {{/snapshot_field}}
+      {{^snapshot_field}}
         LEFT JOIN {{join_table}} alias ON alias.{{child_key}} = model.id
-      {{/if}}
+      {{/snapshot_field}}
       WHERE alias.{{parent_key}} IS NOT NULL
     )
     SELECT model.*, tree.*
@@ -84,7 +87,7 @@ ancestor_query: |
         alias.{{child_key}}, alias.{{parent_key}},
         ARRAY[alias.{{parent_key}}] AS {{path}}, 1 AS {{depth}}, false AS {{cycle}}
       FROM {{join_table}} alias
-        {{#if snapshot_field}}JOIN snapshot ON snapshot.id = alias.id{{/if}}
+        {{#snapshot_field}}JOIN snapshot ON snapshot.id = alias.id{{/snapshot_field}}
       WHERE alias.{{child_key}} = __model_id__
       UNION ALL
       SELECT
@@ -94,24 +97,25 @@ ancestor_query: |
         alias.{{parent_key}} = ANY(tree.{{path}}) AS {{cycle}}
       FROM tree
         JOIN {{join_table}} alias ON alias.{{child_key}} = tree.{{parent_key}}
-        {{#if snapshot_field}}JOIN snapshot ON snapshot.id = alias.id{{/if}}
+        {{#snapshot_field}}JOIN snapshot ON snapshot.id = alias.id{{/snapshot_field}}
       WHERE NOT tree.{{cycle}}
     )
     ,snapshot AS (
       SELECT alias.id
       FROM {{model_table}} model
-      {{#if snapshot_field}}
+      {{#snapshot_field}}
         LEFT JOIN (
           SELECT {{child_key}}, {{parent_key}}, {{snapshot_field}}, id,
-            {{#is_active_field}}{{this}}, {{/is_active_field}}
+            {{#is_active_field}}{{is_active_field}}, {{/is_active_field}}
             RANK() OVER (PARTITION BY {{child_key}} ORDER BY {{snapshot_field}} DESC, id DESC)
           FROM {{join_table}}
           WHERE {{snapshot_field}} <= '__snapshot_value__'
-          {{#is_active_field}}AND {{this}}{{/is_active_field}}
+          {{#is_active_field}}AND {{is_active_field}}{{/is_active_field}}
         ) AS alias ON alias.{{child_key}} = model.id AND COALESCE(rank, 1) = 1
-      {{else}}
+      {{/snapshot_field}}
+      {{^snapshot_field}}
         LEFT JOIN {{join_table}} alias ON alias.{{child_key}} = model.id
-      {{/if}}
+      {{/snapshot_field}}
       WHERE alias.{{parent_key}} IS NOT NULL
     )
     SELECT model.*, tree.*

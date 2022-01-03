@@ -140,10 +140,8 @@ module SnapshotTree
       def nodes_query(query_type)
         return @query[query_type] if @query[query_type]
 
-        @query[query_type] = Handlebars::Context.new.compile(
-          @template["#{query_type}_query"]
-        ).call(
-          {
+        @query[query_type] = Mustache.render(
+          @template["#{query_type}_query"], {
             model_table:     @opts[:model_table],
             join_table:      @opts[:join_table],
             child_key:       "#{@opts[:child_key]}",
