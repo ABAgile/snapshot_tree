@@ -66,7 +66,7 @@ module SnapshotTree
           dependent:   options[:dependent]
 
         has_many :child_tree_nodes,
-          -> { where(optoins[:is_active_field].to_sym => true) if options[:is_active_field] },
+          -> { where(options[:is_active_field].to_sym => true) if options[:is_active_field] },
           class_name:  options[:join_class],
           foreign_key: options[:parent_key],
           autosave:    true,
